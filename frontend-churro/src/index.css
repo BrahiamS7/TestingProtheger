@@ -1,0 +1,296 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 20%;
+
+    /* Professional blue for titles */
+    --primary: 210 65% 37.5%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Bright blue accent */
+    --secondary: 192 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 0 0% 50%;
+
+    /* Accent blue */
+    --accent: 192 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 65% 37.5%;
+
+    --radius: 0.75rem;
+
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(210, 65%, 37.5%) 0%,
+      hsl(192, 100%, 50%) 100%
+    );
+    --gradient-overlay: linear-gradient(
+      180deg,
+      rgba(33, 82, 124, 0.8) 0%,
+      rgba(0, 204, 255, 0.8) 100%
+    );
+
+    /* Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(210 65% 37.5% / 0.3);
+    --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Animación de rebote lento para el botón de WhatsApp */
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-bounce-slow {
+    animation: bounce-slow 3s ease-in-out infinite;
+  }
+
+  /* Animación de pulso para el indicador online */
+  @keyframes pulse-green {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  .animate-pulse-green {
+    animation: pulse-green 2s ease-in-out infinite;
+  }
+
+  /* Animaciones de scroll */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  .scroll-animate-in {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .scroll-animate-out {
+    animation: fadeOut 0.4s ease-out forwards;
+  }
+
+  .scroll-animate-left {
+    animation: fadeInLeft 0.6s ease-out forwards;
+  }
+
+  .scroll-animate-right {
+    animation: fadeInRight 0.6s ease-out forwards;
+  }
+
+  .scroll-animate-down {
+    animation: fadeInDown 0.6s ease-out forwards;
+  }
+
+  .scroll-hidden {
+    opacity: 0;
+  }
+
+  /* Animaciones para Navbar */
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .navbar-animate {
+    animation: slideDown 0.5s ease-out forwards;
+  }
+
+  .logo-hover {
+    transition: transform 0.3s ease;
+  }
+
+  .logo-hover:hover {
+    transform: scale(1.05);
+  }
+
+  /* Animaciones para Footer */
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rotateIn {
+    from {
+      opacity: 0;
+      transform: rotate(-10deg) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+  }
+
+  .footer-animate {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .social-icon {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .social-icon:hover {
+    transform: scale(1.2) rotate(5deg);
+    color: hsl(192, 100%, 50%);
+  }
+
+  .city-item {
+    transition: all 0.3s ease;
+  }
+
+  .city-item:hover {
+    transform: translateX(5px);
+  }
+
+  /* Animación escalonada para elementos del footer */
+  @keyframes fadeInStagger {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .stagger-animate {
+    animation: fadeInStagger 0.5s ease-out forwards;
+    opacity: 0;
+  }
+
+  .stagger-animate:nth-child(1) { animation-delay: 0.1s; }
+  .stagger-animate:nth-child(2) { animation-delay: 0.2s; }
+  .stagger-animate:nth-child(3) { animation-delay: 0.3s; }
+  .stagger-animate:nth-child(4) { animation-delay: 0.4s; }
+  .stagger-animate:nth-child(5) { animation-delay: 0.5s; }
+  .stagger-animate:nth-child(6) { animation-delay: 0.6s; }
+}
