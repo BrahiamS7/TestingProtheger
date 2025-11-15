@@ -23,7 +23,7 @@ router.post("/empleate", upload.single("archivo"), async (req, res) => {
   try {
     const response = await resend.emails.send({
       from: "PROTHEGER <onboarding@resend.dev>",
-      to: "bfsoto16@yopmail.com",
+      to: "certificacion.protheger@gmail.com",
       subject: "📄 Nueva hoja de vida recibida",
       html: `
         <h2>📥 Nueva solicitud de empleo</h2>

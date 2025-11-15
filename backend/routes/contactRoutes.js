@@ -14,7 +14,7 @@ router.post("/contact", async (req, res) => {
   try {
     await resend.emails.send({
       from: "PROTHEGER <onboarding@resend.dev>",
-      to: "bfsoto16@yopmail.com",
+      to: "certificacion.protheger@gmail.com",
       subject: "Nueva solicitud de estudiante",
       html: `
         <h2>📋 Nueva solicitud recibida</h2>
