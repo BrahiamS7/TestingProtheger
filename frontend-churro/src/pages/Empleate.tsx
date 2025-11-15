@@ -49,13 +49,19 @@ const Empleate = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nombre || !formData.correo || !formData.celular || !formData.formacion || !formData.ciudad) {
+    if (
+      !formData.nombre ||
+      !formData.correo ||
+      !formData.celular ||
+      !formData.formacion ||
+      !formData.ciudad
+    ) {
       toast({
         title: "Error",
-        description: "Por favor completa todos los campos requeridos.",
+        description: "Por favor completa todos los campos.",
         variant: "destructive",
       });
       return;
@@ -64,29 +70,56 @@ const Empleate = () => {
     if (!archivo) {
       toast({
         title: "Error",
-        description: "Por favor adjunta tu hoja de vida.",
+        description: "Adjunta tu hoja de vida.",
         variant: "destructive",
       });
       return;
     }
 
-    toast({
-      title: "¡Hoja de vida enviada!",
-      description: "Revisaremos tu perfil y nos contactaremos pronto.",
-    });
+    const data = new FormData();
+    data.append("nombre", formData.nombre);
+    data.append("correo", formData.correo);
+    data.append("celular", formData.celular);
+    data.append("formacion", formData.formacion);
+    data.append("ciudad", formData.ciudad);
+    data.append("archivo", archivo);
 
-    setFormData({
-      nombre: "",
-      correo: "",
-      celular: "",
-      formacion: "",
-      ciudad: "",
-    });
-    setArchivo(null);
+    try {
+      const res = await fetch("http://localhost:4000/api/empleate", {
+        method: "POST",
+        body: data,
+      });
+
+      const result = await res.json();
+
+      if (!result.ok) throw new Error();
+
+      toast({
+        title: "¡Hoja de vida enviada!",
+        description: "Nos pondremos en contacto si cumples el perfil.",
+      });
+
+      setFormData({
+        nombre: "",
+        correo: "",
+        celular: "",
+        formacion: "",
+        ciudad: "",
+      });
+      setArchivo(null);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo enviar. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   const selectedCity = ciudades.find((c) => c.value === formData.ciudad);
-  const [visibleElements, setVisibleElements] = useState<Set<number>>(new Set());
+  const [visibleElements, setVisibleElements] = useState<Set<number>>(
+    new Set()
+  );
   const [exitedElements, setExitedElements] = useState<Set<number>>(new Set());
   const elementRefs = useRef<(HTMLElement | null)[]>([]);
 
@@ -144,7 +177,9 @@ const Empleate = () => {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-overlay flex items-center justify-center">
-            <h1 className="text-5xl font-bold text-white animate-fade-in">Empléate</h1>
+            <h1 className="text-5xl font-bold text-white animate-fade-in">
+              Empléate
+            </h1>
           </div>
         </div>
 
@@ -153,14 +188,20 @@ const Empleate = () => {
             <div
               ref={(el) => (elementRefs.current[0] = el)}
               className={`transition-all duration-600 ${
-                visibleElements.has(0) ? "scroll-animate-left" : exitedElements.has(0) ? "scroll-animate-out scroll-hidden" : "scroll-hidden"
+                visibleElements.has(0)
+                  ? "scroll-animate-left"
+                  : exitedElements.has(0)
+                  ? "scroll-animate-out scroll-hidden"
+                  : "scroll-hidden"
               }`}
             >
               <h2 className="text-3xl font-bold text-primary mb-6">
                 Envía tu Hoja de Vida
               </h2>
               <p className="text-muted-foreground mb-8">
-                Tenemos convenios con las mejores empresas del sector. Comparte tu hoja de vida con nosotros y te conectaremos con excelentes oportunidades laborales.
+                Tenemos convenios con las mejores empresas del sector. Comparte
+                tu hoja de vida con nosotros y te conectaremos con excelentes
+                oportunidades laborales.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -169,7 +210,9 @@ const Empleate = () => {
                   <Input
                     id="nombre"
                     value={formData.nombre}
-                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nombre: e.target.value })
+                    }
                     placeholder="Tu nombre completo"
                     required
                   />
@@ -181,7 +224,9 @@ const Empleate = () => {
                     id="correo"
                     type="email"
                     value={formData.correo}
-                    onChange={(e) => setFormData({ ...formData, correo: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, correo: e.target.value })
+                    }
                     placeholder="tu@email.com"
                     required
                   />
@@ -193,7 +238,9 @@ const Empleate = () => {
                     id="celular"
                     type="tel"
                     value={formData.celular}
-                    onChange={(e) => setFormData({ ...formData, celular: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, celular: e.target.value })
+                    }
                     placeholder="3001234567"
                     required
                   />
@@ -203,14 +250,19 @@ const Empleate = () => {
                   <Label htmlFor="formacion">Formación *</Label>
                   <Select
                     value={formData.formacion}
-                    onValueChange={(value) => setFormData({ ...formData, formacion: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, formacion: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona tu formación" />
                     </SelectTrigger>
                     <SelectContent>
                       {formaciones.map((formacion) => (
-                        <SelectItem key={formacion.value} value={formacion.value}>
+                        <SelectItem
+                          key={formacion.value}
+                          value={formacion.value}
+                        >
                           {formacion.label}
                         </SelectItem>
                       ))}
@@ -222,7 +274,9 @@ const Empleate = () => {
                   <Label htmlFor="ciudad">Ciudad *</Label>
                   <Select
                     value={formData.ciudad}
-                    onValueChange={(value) => setFormData({ ...formData, ciudad: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, ciudad: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona tu ciudad" />
@@ -247,7 +301,9 @@ const Empleate = () => {
                       <div className="space-y-2 text-center">
                         <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
                         <div className="text-sm text-muted-foreground">
-                          {archivo ? archivo.name : "Haz clic para cargar tu CV"}
+                          {archivo
+                            ? archivo.name
+                            : "Haz clic para cargar tu CV"}
                         </div>
                       </div>
                       <input
@@ -261,7 +317,11 @@ const Empleate = () => {
                   </div>
                 </div>
 
-                <Button type="submit" size="lg" className="w-full bg-gradient-primary">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full bg-gradient-primary"
+                >
                   Enviar Hoja de Vida
                 </Button>
               </form>
@@ -270,10 +330,16 @@ const Empleate = () => {
             <div
               ref={(el) => (elementRefs.current[1] = el)}
               className={`transition-all duration-600 ${
-                visibleElements.has(1) ? "scroll-animate-right" : exitedElements.has(1) ? "scroll-animate-out scroll-hidden" : "scroll-hidden"
+                visibleElements.has(1)
+                  ? "scroll-animate-right"
+                  : exitedElements.has(1)
+                  ? "scroll-animate-out scroll-hidden"
+                  : "scroll-hidden"
               }`}
             >
-              <h2 className="text-3xl font-bold text-primary mb-6">Dónde Estamos</h2>
+              <h2 className="text-3xl font-bold text-primary mb-6">
+                Dónde Estamos
+              </h2>
               <p className="text-muted-foreground mb-6">
                 {selectedCity
                   ? `Sede ${selectedCity.label}`
@@ -293,7 +359,9 @@ const Empleate = () => {
                   />
                 ) : (
                   <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">Selecciona una ciudad para ver el mapa</p>
+                    <p className="text-muted-foreground">
+                      Selecciona una ciudad para ver el mapa
+                    </p>
                   </div>
                 )}
               </div>

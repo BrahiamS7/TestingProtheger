@@ -1,5 +1,8 @@
 import express from "express";
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+
+dotenv.config(); // <--- Carga el .env
 
 const router = express.Router();
 
@@ -11,14 +14,14 @@ router.post("/contact", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "certificacion.protheger@gmail.com", // 👉 cambia por el correo que enviará
-        pass: "certificadosprotheger123", // 👉 usa contraseña de aplicación
+        user: process.env.EMAIL_USER, // 💡 viene del .env
+        pass: process.env.EMAIL_PASS, // 💡 viene del .env
       },
     });
 
     const mailOptions = {
-      from: `"Formulario PROTHEGER" <tucorreo@gmail.com>`,
-      to: "bfsoto16@gmail.com", // 👉 correo que recibirá la info
+      from: `"Formulario PROTHEGER" <${process.env.EMAIL_USER}>`,
+      to: "bfsoto16@yopmail.com", // correo que recibe la solicitud
       subject: "Nueva solicitud de estudiante",
       html: `
         <h2>📋 Nueva solicitud recibida</h2>
@@ -32,6 +35,7 @@ router.post("/contact", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
     res.status(200).json({ ok: true, msg: "Correo enviado correctamente" });
+
   } catch (error) {
     console.error("❌ Error al enviar el correo:", error);
     res.status(500).json({ ok: false, msg: "Error al enviar el correo" });
