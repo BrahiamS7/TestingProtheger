@@ -1,15 +1,9 @@
-import express from "express";
-import multer from "multer";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const router = express.Router();
-
-// 📁 Configurar multer (archivos temporales)
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/empleate", upload.single("archivo"), async (req, res) => {
   const { nombre, correo, celular, formacion, ciudad } = req.body;
@@ -19,16 +13,8 @@ router.post("/empleate", upload.single("archivo"), async (req, res) => {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: `"Empléate PROTHEGER" <${process.env.EMAIL_USER}>`,
+    const response = await resend.emails.send({
+      from: "PROTHEGER <onboarding@resend.dev>",
       to: "bfsoto16@yopmail.com",
       subject: "📄 Nueva hoja de vida recibida",
       html: `
@@ -42,18 +28,14 @@ router.post("/empleate", upload.single("archivo"), async (req, res) => {
       attachments: [
         {
           filename: req.file.originalname,
-          content: req.file.buffer,
+          content: req.file.buffer.toString("base64"),
         },
       ],
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 
     res.json({ ok: true, msg: "Hoja de vida enviada correctamente" });
-  } catch (err) {
-    console.error("❌ Error al enviar correo:", err);
-    res.status(500).json({ ok: false, msg: "Error al enviar el correo" });
+  } catch (error) {
+    console.error("ERROR RESEND:", error);
+    res.status(500).json({ ok: false, msg: "Error al enviar correo" });
   }
 });
-
-export default router;

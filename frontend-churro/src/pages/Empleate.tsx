@@ -15,7 +15,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Upload } from "lucide-react";
 import empleate from "@/assets/empleate.webp";
-
+const API_URL = "https://protheger-backend.onrender.com/api";
 const Empleate = () => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
@@ -85,7 +85,7 @@ const Empleate = () => {
     data.append("archivo", archivo);
 
     try {
-      const res = await fetch("http://localhost:4000/api/empleate", {
+      const res = await fetch("https://protheger-backend.onrender.com/api/empleate", {
         method: "POST",
         body: data,
       });

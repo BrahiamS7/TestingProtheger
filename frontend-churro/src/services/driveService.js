@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000/api"; // Cambiar a Render cuando despliegues
+const API_URL = "https://protheger-backend.onrender.com/api";
 
 // Buscar carpeta por cédula
 export async function findFolderByCedula(cedula) {
