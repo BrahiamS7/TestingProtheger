@@ -1,8 +1,10 @@
 import { Resend } from "resend";
 import dotenv from "dotenv";
+import express from "express";
 
 dotenv.config();
 
+const router = express.Router();
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/empleate", upload.single("archivo"), async (req, res) => {
