@@ -1,6 +1,6 @@
-const API_URL = "https://protheger-backend.onrender.com/api";
+const API_URL = "https://testingprotheger.onrender.com/api";
 
-// Buscar carpeta por cédula
+// Buscar carpeta por cédula 
 export async function findFolderByCedula(cedula) {
   const response = await fetch(`${API_URL}/folder/${cedula}`);
   if (!response.ok) {
