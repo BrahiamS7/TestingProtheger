@@ -9,6 +9,7 @@ import {
   listFiles,
   deleteFile,
   updateFile,
+  deleteFolder, // ✅ nuevo
 } from "../services/driveService.js";
 
 const router = express.Router();
@@ -166,6 +167,22 @@ router.get("/download/:fileId", async (req, res) => {
   } catch (error) {
     console.error("❌ Error al descargar archivo:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+/* ============================================
+   🗑️ ELIMINAR CARPETA
+   ============================================ */
+router.delete("/folder/:folderId", async (req, res) => {
+  try {
+    const { folderId } = req.params;
+
+    const result = await deleteFolder(folderId);
+
+    res.json(result);
+  } catch (err) {
+    console.error("❌ Error al eliminar carpeta:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

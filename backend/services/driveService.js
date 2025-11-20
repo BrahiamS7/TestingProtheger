@@ -163,3 +163,17 @@ export const updateFile = async (fileId, filePath, newName) => {
     throw err;
   }
 };
+
+
+/* ============================================
+   🗑️ ELIMINAR CARPETA (Drive)
+   ============================================ */
+export const deleteFolder = async (folderId) => {
+  const auth = await authenticate();
+  const drive = google.drive({ version: "v3", auth });
+
+  // Esto elimina (manda a papelera) la carpeta
+  await drive.files.delete({ fileId: folderId });
+
+  return { success: true, folderId };
+};
