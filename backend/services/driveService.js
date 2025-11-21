@@ -8,6 +8,8 @@ export const createFolder = async (name, parentId) => {
   try {
     const auth = await authenticate();
     const drive = google.drive({ version: "v3", auth });
+    const about = await drive.about.get({ fields: "user(emailAddress)" });
+    console.log("✅ Cuenta autenticada:", about.data.user.emailAddress);
 
     // 🔎 Buscar si ya existe la carpeta
     const query = `mimeType='application/vnd.google-apps.folder' and name='${name}' and '${parentId}' in parents and trashed=false`;

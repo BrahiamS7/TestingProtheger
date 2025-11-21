@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Google OAuth secrets
+backend/config/credentials.json
+backend/config/token.json

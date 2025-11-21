@@ -51,10 +51,10 @@ router.get("/folder/:cedula", async (req, res) => {
    ============================================ */
 router.post("/folder/:cedula", async (req, res) => {
   try {
-    const folder = await createFolder(
-      req.params.cedula,
-      "1wqaEep30SJym-jw38mDxXl-_hAsa0Xdu" // 🧭 ID de carpeta padre
-    );
+    const parentId = process.env.GOOGLE_ROOT_FOLDER_ID;
+
+    const folder = await createFolder(req.params.cedula, parentId);
+
     res.json(folder);
   } catch (err) {
     console.error("❌ Error al crear carpeta:", err);

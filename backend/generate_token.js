@@ -56,6 +56,7 @@ app.listen(PORT, async () => {
   });
 
   console.log(`Abriendo URL de autorización (si el navegador no se abre, copia la URL):\n\n${authUrl}\n`);
+  console.log("REDIRECT REAL ->", oAuth2Client.redirectUri);
   // intenta abrir el navegador automáticamente (opcional)
   try {
     await open(authUrl);
@@ -63,3 +64,6 @@ app.listen(PORT, async () => {
     console.log("No se pudo abrir el navegador automáticamente. Copia y pega la URL en tu navegador.");
   }
 });
+
+
+
