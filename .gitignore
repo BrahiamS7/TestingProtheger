@@ -1,2 +1,52 @@
+# ==========================
+# Secrets / tokens (NO subir)
+# ==========================
 backend/config/token.json
-backend/config/token.json
+backend/token.json
+token.json
+
+backend/config/credentials.json
+credentials.json
+
+.env
+.env.*
+!.env.example
+
+# Claves/certificados
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*credentials*.json
+*token*.json
+
+# ==========================
+# Java / Maven / Gradle
+# ==========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle (por si acaso)
+build/
+.gradle/
+
+# ==========================
+# NetBeans
+# ==========================
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+*.nbattrs
+
+# ==========================
+# Eclipse / IntelliJ (por si abres en otro
