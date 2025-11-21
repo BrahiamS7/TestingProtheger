@@ -78,7 +78,6 @@ export {
   uploadFile,
   listFiles,
   deleteFile,
-  cleanupOldFiles,
   updateFile,
   deleteFolder,
 };
