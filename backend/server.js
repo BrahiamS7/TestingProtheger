@@ -10,19 +10,17 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS abierto para cualquier origen (producción, sin credentials)
-app.use(cors({
+// ✅ CORS abierto para cualquier origen (sin credentials)
+const corsOptions = {
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
 
-// ✅ Preflight para todas las rutas (NO usar "*", usa "/*")
-app.options("/*", cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(cors(corsOptions));
+
+// ✅ Preflight para todas las rutas usando REGEX (no string)
+app.options(/.*/, cors(corsOptions));
 
 app.use(express.json());
 
@@ -31,7 +29,6 @@ app.use("/api", driveRoutes);
 app.use("/api", contactRoutes);
 app.use("/api", empleateRoutes);
 
-// Puerto dinámico (Render usa process.env.PORT)
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
