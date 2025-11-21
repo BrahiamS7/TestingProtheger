@@ -71,3 +71,14 @@ export async function authenticate() {
 
   return oAuth2Client;
 }
+// ... todo tu código arriba
+
+export {
+  createFolder,
+  uploadFile,
+  listFiles,
+  deleteFile,
+  cleanupOldFiles,
+  updateFile,
+  deleteFolder,
+};
