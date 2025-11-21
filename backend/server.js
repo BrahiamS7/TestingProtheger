@@ -10,7 +10,23 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// ✅ CORS explícito
+const corsOptions = {
+  origin: [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    // si luego subes tu front a otro dominio, lo agregas aquí
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+// ✅ Primero CORS
+app.use(cors(corsOptions));
+// ✅ Responder SIEMPRE preflight
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 
 // Rutas
@@ -21,5 +37,5 @@ app.use("/api", empleateRoutes);
 // Puerto dinámico (Render usa process.env.PORT)
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
