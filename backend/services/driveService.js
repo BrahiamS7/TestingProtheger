@@ -1,83 +1,179 @@
-// backend/config/googleDriveConfig.js
+// backend/services/driveService.js
 import { google } from "googleapis";
 import fs from "fs";
-import path from "path";
+import { authenticate } from "../config/googleDriveConfig.js";
 
-const CREDENTIALS_PATH = path.resolve("backend/config/credentials.json");
-const TOKEN_PATH = path.resolve("backend/config/token.json");
+// ✅ Crear carpeta
+export const createFolder = async (name, parentId) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
 
-export async function authenticate() {
-  // =========================
-  // 1) Cargar credenciales
-  // =========================
-  let clientId = process.env.GOOGLE_CLIENT_ID;
-  let clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  let redirectUri = process.env.GOOGLE_REDIRECT_URI;
+    // 🔎 Buscar si ya existe la carpeta
+    const query = `mimeType='application/vnd.google-apps.folder' and name='${name}' and '${parentId}' in parents and trashed=false`;
+    const existing = await drive.files.list({
+      q: query,
+      fields: "files(id, name)",
+    });
 
-  if (!clientId || !clientSecret || !redirectUri) {
-    if (!fs.existsSync(CREDENTIALS_PATH)) {
-      throw new Error(
-        "No encontré credentials.json y tampoco variables GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI."
-      );
+    if (existing.data.files.length > 0) {
+      return {
+        folderId: existing.data.files[0].id,
+        name: existing.data.files[0].name,
+        message: "⚠️ Carpeta ya existente",
+      };
     }
 
-    const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH, "utf8"));
-    const web = credentials.web || credentials.installed;
+    // 🆕 Crear nueva carpeta
+    const fileMetadata = {
+      name,
+      mimeType: "application/vnd.google-apps.folder",
+      parents: [parentId],
+    };
 
-    clientId = clientId || web.client_id;
-    clientSecret = clientSecret || web.client_secret;
-    redirectUri = redirectUri || (web.redirect_uris && web.redirect_uris[0]);
-  }
-
-  const oAuth2Client = new google.auth.OAuth2(
-    clientId,
-    clientSecret,
-    redirectUri
-  );
-
-  // =========================
-  // 2) Cargar tokens
-  // =========================
-  let tokens = null;
-
-  // Local: token.json existe
-  if (fs.existsSync(TOKEN_PATH)) {
-    tokens = JSON.parse(fs.readFileSync(TOKEN_PATH, "utf8"));
-  }
-
-  // Producción (Render): usar refresh token desde env
-  if (!tokens && process.env.GOOGLE_REFRESH_TOKEN) {
-    tokens = { refresh_token: process.env.GOOGLE_REFRESH_TOKEN };
-  }
-
-  if (!tokens) {
-    throw new Error(
-      "No hay tokens configurados. Genera token.json en local o define GOOGLE_REFRESH_TOKEN en Render."
-    );
-  }
-
-  oAuth2Client.setCredentials(tokens);
-
-  // =========================
-  // 3) (Opcional) Guardar tokens refrescados en local
-  // =========================
-  if (fs.existsSync(TOKEN_PATH)) {
-    oAuth2Client.on("tokens", (newTokens) => {
-      const merged = { ...tokens, ...newTokens };
-      fs.writeFileSync(TOKEN_PATH, JSON.stringify(merged, null, 2));
-      tokens = merged;
+    const folder = await drive.files.create({
+      resource: fileMetadata,
+      fields: "id, name",
     });
+
+    return {
+      folderId: folder.data.id,
+      name: folder.data.name,
+      message: "✅ Carpeta creada exitosamente",
+    };
+  } catch (err) {
+    console.error("❌ Error al crear carpeta:", err.message);
+    throw err;
   }
+};
 
-  return oAuth2Client;
-}
-// ... todo tu código arriba
+// ✅ Subir archivo
+export const uploadFile = async (folderId, filePath, fileName) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
 
-export {
-  createFolder,
-  uploadFile,
-  listFiles,
-  deleteFile,
-  updateFile,
-  deleteFolder,
+    const fileMetadata = {
+      name: fileName,
+      parents: [folderId],
+    };
+
+    const media = {
+      body: fs.createReadStream(filePath),
+    };
+
+    const response = await drive.files.create({
+      resource: fileMetadata,
+      media,
+      fields: "id, name, webViewLink, webContentLink",
+    });
+
+    return response.data;
+  } catch (err) {
+    console.error("❌ Error al subir archivo:", err.message);
+    throw err;
+  }
+};
+
+// 🧹 Eliminar archivos con más de 1 año de antigüedad (uso interno)
+const cleanupOldFiles = async (folderId) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
+
+    const res = await drive.files.list({
+      q: `'${folderId}' in parents and trashed=false`,
+      fields: "files(id, name, createdTime)",
+    });
+
+    const now = new Date();
+
+    const oldFiles = res.data.files.filter((file) => {
+      const created = new Date(file.createdTime);
+      const diffDays = (now - created) / (1000 * 60 * 60 * 24);
+      return diffDays > 365;
+    });
+
+    for (const file of oldFiles) {
+      await drive.files.delete({ fileId: file.id });
+      console.log(`🗑️ Archivo eliminado por antigüedad: ${file.name}`);
+    }
+  } catch (err) {
+    console.error("❌ Error al limpiar archivos antiguos:", err.message);
+  }
+};
+
+// ✅ Listar archivos
+export const listFiles = async (folderId) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
+
+    await cleanupOldFiles(folderId);
+
+    const response = await drive.files.list({
+      q: `'${folderId}' in parents and trashed=false`,
+      fields:
+        "files(id, name, mimeType, webViewLink, webContentLink, createdTime)",
+    });
+
+    return response.data.files;
+  } catch (err) {
+    console.error("❌ Error al listar archivos:", err.message);
+    throw err;
+  }
+};
+
+// ✅ Eliminar archivo
+export const deleteFile = async (fileId) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
+
+    await drive.files.delete({ fileId });
+    console.log(`🗑️ Archivo eliminado: ${fileId}`);
+  } catch (err) {
+    console.error("❌ Error al eliminar archivo:", err.message);
+    throw err;
+  }
+};
+
+// ✅ Editar (reemplazar) archivo existente
+export const updateFile = async (fileId, filePath, newName) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
+
+    const media = {
+      body: fs.createReadStream(filePath),
+    };
+
+    const response = await drive.files.update({
+      fileId,
+      media,
+      resource: { name: newName },
+      fields: "id, name, webViewLink, webContentLink",
+    });
+
+    return response.data;
+  } catch (err) {
+    console.error("❌ Error al actualizar archivo:", err.message);
+    throw err;
+  }
+};
+
+/* ============================================
+   🗑️ ELIMINAR CARPETA (Drive)
+   ============================================ */
+export const deleteFolder = async (folderId) => {
+  try {
+    const auth = await authenticate();
+    const drive = google.drive({ version: "v3", auth });
+
+    await drive.files.delete({ fileId: folderId });
+    return { success: true, folderId };
+  } catch (err) {
+    console.error("❌ Error al eliminar carpeta:", err.message);
+    throw err;
+  }
 };
