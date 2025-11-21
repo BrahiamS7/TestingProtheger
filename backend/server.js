@@ -10,22 +10,19 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS explícito
-const corsOptions = {
-  origin: [
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    // si luego subes tu front a otro dominio, lo agregas aquí
-  ],
+// ✅ CORS abierto para cualquier origen (producción, sin credentials)
+app.use(cors({
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
+}));
 
-// ✅ Primero CORS
-app.use(cors(corsOptions));
-// ✅ Responder SIEMPRE preflight
-app.options("*", cors(corsOptions));
+// ✅ Preflight para todas las rutas (NO usar "*", usa "/*")
+app.options("/*", cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 
