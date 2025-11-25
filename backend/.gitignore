@@ -54,3 +54,8 @@ nbdist/
 
 # ==========================
 # Eclipse / IntelliJ (por si abres en otro
+
+# nunca subir envs
+.env
+backend/.env
+
